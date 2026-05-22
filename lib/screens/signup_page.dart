@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class LoginPage extends StatefulWidget{
-  const LoginPage({super.key});
+class SignUpPage extends StatefulWidget{
+  const SignUpPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
 
@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
               final pass=_passController.text.trim();
 
               try{
-                final AuthResponse res = await supabase.auth.signInWithPassword(
+                final AuthResponse res = await supabase.auth.signUp(
                   email: email,
                   password: pass,
                 );
@@ -62,13 +62,7 @@ class _LoginPageState extends State<LoginPage> {
                 print('Login failed: $e');
               }
             },
-            child: Text('Login!'),
-          ),
-          TextButton(
-            onPressed: () {
-              context.go('/signup');
-            }, 
-            child: Text("Don't have an account? Sign up!"),
+            child: Text('Sign Up!')
           )
         ],
       )

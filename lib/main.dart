@@ -3,6 +3,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'screens/login_page.dart';
+import 'screens/signup_page.dart';
+import 'screens/home_page.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +24,10 @@ final _router = GoRouter(
                     GoRoute(
                       path: '/login',
                       builder: (context,state) => const LoginPage(),
+                    ),
+                    GoRoute(
+                      path: '/signup',
+                      builder: (context,state) => const SignUpPage(),
                     ),
                   ],
 );
