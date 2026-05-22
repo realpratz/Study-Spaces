@@ -6,7 +6,7 @@ import 'screens/login_page.dart';
 import 'screens/signup_page.dart';
 import 'screens/home_page.dart';
 
-
+final supabase = Supabase.instance.client;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -20,6 +20,22 @@ Future<void> main() async {
 
 final _router = GoRouter(
                   initialLocation: "/login",
+                  redirect: (context, state) {
+                    final session = supabase.auth.currentSession;
+                    final isLoggedIn= (session!=null);
+
+                    final isGoingToAuth = (state.uri.path == '/login' || state.uri.path == '/signup');
+
+                    if(!isLoggedIn && !isGoingToAuth){
+                      return '/login';
+                    }
+
+                    if(isLoggedIn && isGoingToAuth){
+                      return '/home';
+                    }
+
+                    return null;
+                  },
                   routes: [
                     GoRoute(
                       path: '/login',
@@ -28,6 +44,10 @@ final _router = GoRouter(
                     GoRoute(
                       path: '/signup',
                       builder: (context,state) => const SignUpPage(),
+                    ),
+                    GoRoute(
+                      path: '/home',
+                      builder: (context,state) => const HomePage(),
                     ),
                   ],
 );
