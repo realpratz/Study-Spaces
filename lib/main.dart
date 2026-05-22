@@ -25,8 +25,6 @@ final _router = GoRouter(
                   ],
 );
 
-//final supabase = Supabase.instance.client;
-
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
