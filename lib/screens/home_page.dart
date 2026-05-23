@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:math';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,9 +10,9 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  final supabase = Supabase.instance.client;
+final supabase = Supabase.instance.client;
 
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,7 +95,20 @@ class _CreateSpaceSheetState extends State<CreateSpaceSheet> {
                 }
               ),
               ElevatedButton(
-                onPressed: (){}, 
+                onPressed: () async {
+                  Map<String, dynamic> data = {};
+                  data['name']=_spaceName.text;
+                  data['description']=_description.text;
+                  data['is_public']=isPublic;
+                  data['creator_id']=supabase.auth.currentUser!.id;
+                  data['invite_code']=Random().nextInt(999999).toString();
+
+                  await supabase.from('spaces').insert(data);
+
+                  if(mounted) {
+                    Navigator.pop(context);
+                  }
+                }, 
                 child: Text('Create Space'),
               ),
             ]
