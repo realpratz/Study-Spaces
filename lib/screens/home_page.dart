@@ -1,45 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
+import "package:study_spaces/providers/spaces_provider.dart";
+import 'package:study_spaces/models/study_space.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
 final supabase = Supabase.instance.client;
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
+    final spacesAsyncValue = ref.watch(spacesProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
       ),
-      body: Center(
-        child: FilledButton(
-          onPressed: () async {
-            await supabase.auth.signOut();
-            
-            if(!mounted) return;
+      body: spacesAsyncValue.when(
+        error: (error, StackTrace){
+          return Center(child: Text('Error: $error'));
+        },
+        loading: () {
+          return Center(child: CircularProgressIndicator());
+        },
+        data: (List<StudySpace> spaces){
+          /*return Center(
+            child: FilledButton(
+              onPressed: () async {
+                await supabase.auth.signOut();
+                
+                if(!mounted) return;
 
-            context.go('/login');
-          },
-          child: Text('Sign Out'),
-        ),
+                context.go('/login');
+              },
+              child: Text('Sign Out'),
+            ),
+          );*/
+          return ListView.builder(
+            itemCount: spaces.length,
+            itemBuilder: (context, index) {
+              final currentSpace = spaces[index];
+              
+              return ListTile(
+                title: Text(currentSpace.name),
+                subtitle: Text(currentSpace.description ?? 'No Description'),
+              );
+            },
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed:(){
-          showModalBottomSheet(
-              context: context, 
-              isScrollControlled: true,
-              builder: (context) => const CreateSpaceSheet(),
-            );
-        },
-        child: Icon(Icons.add),
+            onPressed:(){
+              showModalBottomSheet(
+                  context: context, 
+                  isScrollControlled: true,
+                  builder: (context) => const CreateSpaceSheet(),
+                );
+            },
+            child: Icon(Icons.add),
       ),
     );
   }
