@@ -12,7 +12,7 @@ class SignUpPage extends StatefulWidget{
 class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
-
+  bool _isLoading=false;
   final supabase = Supabase.instance.client;
 
   @override
@@ -42,15 +42,20 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
           ),
           FilledButton(
-            onPressed: () async {
+            onPressed: _isLoading? null :() async {
               final email=_emailController.text.trim();
               final pass=_passController.text.trim();
+              
+              setState(() {
+                _isLoading = true;
+              });
 
               try{
                 final AuthResponse res = await supabase.auth.signUp(
                   email: email,
                   password: pass,
                 );
+
                 final Session? session = res.session;
                 final User? user = res.user;
 
@@ -70,8 +75,12 @@ class _SignUpPageState extends State<SignUpPage> {
                   }
                 }
               }
+
+              setState(() {
+                _isLoading = false;
+              });
             },
-            child: Text('Sign Up!')
+            child:_isLoading?CircularProgressIndicator():  Text('Sign Up!')
           )
         ],
       )

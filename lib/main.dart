@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'screens/login_page.dart';
 import 'screens/signup_page.dart';
 import 'screens/home_page.dart';
+import 'screens/space_detail_screen.dart';
 
 final supabase = Supabase.instance.client;
 Future<void> main() async {
@@ -48,6 +49,17 @@ final _router = GoRouter(
                     GoRoute(
                       path: '/home',
                       builder: (context,state) => const HomePage(),
+                    ),
+                    GoRoute(
+                      path: '/space',
+                      builder: (context, state) {
+                        final extras = state.extra as Map<String, dynamic>;
+                        
+                        return SpaceDetailScreen(
+                          spaceID: extras['id'] as String,
+                          spaceName: extras['name'] as String,
+                        );
+                      },
                     ),
                   ],
 );

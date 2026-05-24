@@ -16,6 +16,7 @@ class HomePage extends ConsumerStatefulWidget {
 final supabase = Supabase.instance.client;
 
 class _HomePageState extends ConsumerState<HomePage> {
+  bool _isLoading=false;
   @override
   Widget build(BuildContext context) {
     final spacesAsyncValue = ref.watch(spacesProvider);
@@ -41,13 +42,27 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ),
                     ),
                     actions:[
+                      IconButton(
+                        icon: Icon(Icons.logout),
+                        onPressed: () async {
+                          await supabase.auth.signOut();
+
+                          if (context.mounted){
+                            context.go('/login');
+                          }
+                        },
+                      ),
                       TextButton(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => context.pop(),
                         child: Text('Cancel'),
                       ),
                       FilledButton(
-                        onPressed: () async {
+                        onPressed: _isLoading?null: () async {
                           final typedCode=_inviteController.text.trim();
+
+                          setState(() {
+                            _isLoading = true;
+                          });
 
                           try{
                             final spaceId = await supabase.rpc(
@@ -67,16 +82,16 @@ class _HomePageState extends ConsumerState<HomePage> {
                             data['user_id']=supabase.auth.currentUser!.id;
 
                             await supabase.from('space_members').insert(data);
-                            
+
                             ref.invalidate(spacesProvider);
 
                             if(context.mounted) {
-                              Navigator.pop(context);
+                              context.pop();
                             }
                           }
                           catch(e){
                             print('Joining Space Failed: $e');
-                            
+
                             if(context.mounted) {
                               if(e is PostgrestException && e.code=='23505') {
                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('You are already a member of this space!')));
@@ -85,9 +100,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('An error occurred while joining. Try again later.')));
                               }
                             }
-                          }     
+                          }
+
+                          if(mounted){
+                            setState(() {
+                              _isLoading = false;
+                            });
+                          }
                         },
-                        child: Text('Join'),
+                        child:_isLoading?CircularProgressIndicator(): Text('Join'),
                       )
                     ]
                   );
@@ -105,18 +126,6 @@ class _HomePageState extends ConsumerState<HomePage> {
           return Center(child: CircularProgressIndicator());
         },
         data: (List<StudySpace> spaces){
-          /*return Center(
-            child: FilledButton(
-              onPressed: () async {
-                await supabase.auth.signOut();
-                
-                if(!mounted) return;
-
-                context.go('/login');
-              },
-              child: Text('Sign Out'),
-            ),
-          );*/
           return ListView.builder(
             itemCount: spaces.length,
             itemBuilder: (context, index) {
@@ -125,6 +134,15 @@ class _HomePageState extends ConsumerState<HomePage> {
               return ListTile(
                 title: Text(currentSpace.name),
                 subtitle: Text(currentSpace.description ?? 'No Description'),
+                onTap: (){
+                  context.push(
+                    '/space',
+                    extra:{
+                      'id': currentSpace.id,
+                      'name': currentSpace.name,
+                    },
+                  );
+                },
               );
             },
           );
@@ -155,6 +173,7 @@ class _CreateSpaceSheetState extends ConsumerState<CreateSpaceSheet> {
   final TextEditingController _spaceName = TextEditingController();
   final TextEditingController _description = TextEditingController();
   bool isPublic = false;
+  bool _isLoading=false;
 
   @override
   void dispose(){
@@ -194,23 +213,57 @@ class _CreateSpaceSheetState extends ConsumerState<CreateSpaceSheet> {
                 }
               ),
               ElevatedButton(
-                onPressed: () async {
-                  Map<String, dynamic> data = {};
-                  data['name']=_spaceName.text;
-                  data['description']=_description.text.isEmpty?null:_description.text;
-                  data['is_public']=isPublic;
-                  data['creator_id']=supabase.auth.currentUser!.id;
-                  data['invite_code']=Random().nextInt(999999).toString();
+                onPressed: _isLoading? null : () async {
+                  if (_spaceName.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Space name cannot be empty!')));
+                    return;
+                  }
 
-                  await supabase.from('spaces').insert(data);
-                  
-                  ref.invalidate(spacesProvider);
+                  setState(() {
+                    _isLoading = true;
+                  });
 
-                  if(context.mounted) {
-                    Navigator.pop(context);
+                  bool success=false;
+
+                  while(!success){
+                    try{
+                      Map<String, dynamic> data = {};
+                      data['name']=_spaceName.text;
+                      data['description']=_description.text.isEmpty?null:_description.text;
+                      data['is_public']=isPublic;
+                      data['creator_id']=supabase.auth.currentUser!.id;
+                      data['invite_code']=Random().nextInt(999999).toString().padLeft(6,'0');
+
+                      await supabase.from('spaces').insert(data);
+                      
+                      success=true;
+
+                      ref.invalidate(spacesProvider);
+
+                      if(context.mounted) {
+                        context.pop();
+                      }
+                    }
+                    catch(e){
+                      print('Creating Space Failed: $e');
+
+                      if(e is PostgrestException && e.code=='23505') {
+                        print('unique code not unique');
+                      }
+                      else{
+                        if(context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('An error occurred while joining. Try again later.')));
+                        break;
+                      }
+                    }    
+                  }
+
+                  if (mounted) {
+                    setState(() {
+                      _isLoading = false;
+                    });
                   }
                 }, 
-                child: Text('Create Space'),
+                child: _isLoading?CircularProgressIndicator(): Text('Create Space'),
               ),
             ]
         )
