@@ -54,12 +54,21 @@ class _SignUpPageState extends State<SignUpPage> {
                 final Session? session = res.session;
                 final User? user = res.user;
 
-                if(!mounted) return;
+                if(!context.mounted) return;
 
                 context.go('/home');
               }
               catch(e){
-                print('Login failed: $e');
+                print('Signup failed: $e');
+
+                if(context.mounted) {
+                  if(e is AuthException) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+                  }
+                  else{
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('An error occurred while signing up. Try again later.')));
+                  }
+                }
               }
             },
             child: Text('Sign Up!')

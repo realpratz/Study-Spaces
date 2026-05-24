@@ -75,8 +75,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                             }
                           }
                           catch(e){
+                            print('Joining Space Failed: $e');
+                            
                             if(context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+                              if(e is PostgrestException && e.code=='23505') {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('You are already a member of this space!')));
+                              }
+                              else{
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('An error occurred while joining. Try again later.')));
+                              }
                             }
                           }     
                         },
