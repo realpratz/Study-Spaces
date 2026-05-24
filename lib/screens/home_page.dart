@@ -70,12 +70,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                             
                             ref.invalidate(spacesProvider);
 
-                            if(mounted) {
+                            if(context.mounted) {
                               Navigator.pop(context);
                             }
                           }
                           catch(e){
-                            if(mounted) {
+                            if(context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
                             }
                           }     
@@ -199,7 +199,7 @@ class _CreateSpaceSheetState extends ConsumerState<CreateSpaceSheet> {
                   
                   ref.invalidate(spacesProvider);
 
-                  if(mounted) {
+                  if(context.mounted) {
                     Navigator.pop(context);
                   }
                 }, 
