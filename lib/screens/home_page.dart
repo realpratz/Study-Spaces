@@ -22,7 +22,73 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        title: Text('My Spaces'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.group_add),
+            onPressed:() async {
+              final TextEditingController _inviteController = TextEditingController();
+
+              showDialog(
+                context: context,
+                builder: (context){
+                  return AlertDialog(
+                    title:Text('Join Space'),
+                    content: TextField(
+                      controller: _inviteController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter 6-digit code',
+                      ),
+                    ),
+                    actions:[
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text('Cancel'),
+                      ),
+                      FilledButton(
+                        onPressed: () async {
+                          final typedCode=_inviteController.text.trim();
+
+                          try{
+                            final spaceId = await supabase.rpc(
+                              'check_invite_code', 
+                              params: {
+                                'code': typedCode
+                                }
+                            );
+
+                            if (spaceId == null){
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invalid code!')));
+                              return;
+                            }
+                            
+                            Map<String, dynamic> data = {};
+                            data['space_id'] = spaceId;
+                            data['user_id']=supabase.auth.currentUser!.id;
+
+                            await supabase.from('space_members').insert(data);
+                            
+                            ref.invalidate(spacesProvider);
+
+                            if(mounted) {
+                              Navigator.pop(context);
+                            }
+                          }
+                          catch(e){
+                            if(mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+                            }
+                          }     
+                        },
+                        child: Text('Join'),
+                      )
+                    ]
+                  );
+                }
+              );
+            },
+            )
+        ],
       ),
       body: spacesAsyncValue.when(
         error: (error, StackTrace){
@@ -62,7 +128,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               showModalBottomSheet(
                   context: context, 
                   isScrollControlled: true,
-                  builder: (context) => const CreateSpaceSheet(),
+                  builder: (context) => CreateSpaceSheet(),
                 );
             },
             child: Icon(Icons.add),
@@ -71,14 +137,14 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 }
 
-class CreateSpaceSheet extends StatefulWidget {
+class CreateSpaceSheet extends ConsumerStatefulWidget {
   const CreateSpaceSheet({super.key});
 
   @override
-  State<CreateSpaceSheet> createState() => _CreateSpaceSheetState();
+  ConsumerState<CreateSpaceSheet> createState() => _CreateSpaceSheetState();
 }
 
-class _CreateSpaceSheetState extends State<CreateSpaceSheet> {
+class _CreateSpaceSheetState extends ConsumerState<CreateSpaceSheet> {
   final TextEditingController _spaceName = TextEditingController();
   final TextEditingController _description = TextEditingController();
   bool isPublic = false;
@@ -124,12 +190,14 @@ class _CreateSpaceSheetState extends State<CreateSpaceSheet> {
                 onPressed: () async {
                   Map<String, dynamic> data = {};
                   data['name']=_spaceName.text;
-                  data['description']=_description.text;
+                  data['description']=_description.text.isEmpty?null:_description.text;
                   data['is_public']=isPublic;
                   data['creator_id']=supabase.auth.currentUser!.id;
                   data['invite_code']=Random().nextInt(999999).toString();
 
                   await supabase.from('spaces').insert(data);
+                  
+                  ref.invalidate(spacesProvider);
 
                   if(mounted) {
                     Navigator.pop(context);
