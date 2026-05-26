@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:study_spaces/screens/profile_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -49,6 +50,10 @@ final _router = GoRouter(
                     GoRoute(
                       path: '/home',
                       builder: (context,state) => const HomePage(),
+                    ),
+                    GoRoute(
+                      path: '/profile',
+                      builder: (context,state) => const ProfileScreen(),
                     ),
                     GoRoute(
                       path: '/space',

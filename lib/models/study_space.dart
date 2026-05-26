@@ -5,7 +5,6 @@ class StudySpace{
   final String? description;
   final bool isPublic;
   final String inviteCode;
-  final String? imageUrl;
   final String creatorId;
 
   StudySpace({
@@ -15,7 +14,6 @@ class StudySpace{
     this.description,
     required this.isPublic,
     required this.inviteCode,
-    this.imageUrl,
     required this.creatorId,
   });
 
@@ -27,7 +25,6 @@ class StudySpace{
       description: json['description'] as String?,
       isPublic: json['is_public'] as bool,
       inviteCode: json['invite_code'] as String,
-      imageUrl: json['image_url'] as String?,
       creatorId: json['creator_id'] as String,
     );
   }

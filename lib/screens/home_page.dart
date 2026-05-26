@@ -42,16 +42,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ),
                     ),
                     actions:[
-                      IconButton(
-                        icon: Icon(Icons.logout),
-                        onPressed: () async {
-                          await supabase.auth.signOut();
-
-                          if (context.mounted){
-                            context.go('/login');
-                          }
-                        },
-                      ),
                       TextButton(
                         onPressed: () => context.pop(),
                         child: Text('Cancel'),
@@ -115,7 +105,25 @@ class _HomePageState extends ConsumerState<HomePage> {
                 }
               );
             },
-            )
+            ),
+            IconButton(
+                icon: Icon(Icons.logout),
+                onPressed: () async {
+                  await supabase.auth.signOut();
+
+                  if (context.mounted){
+                    context.go('/login');
+                  }
+                },
+              ),
+            IconButton(
+              icon: Icon(Icons.home),
+              onPressed: (){
+                if (context.mounted){
+                  context.go('/profile');
+                }
+              },
+            ),
         ],
       ),
       body: spacesAsyncValue.when(
