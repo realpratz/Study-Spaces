@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
 import "package:study_spaces/providers/spaces_provider.dart";
 import 'package:study_spaces/models/study_space.dart';
+import 'package:study_spaces/services/auth_service.dart';
+import 'package:study_spaces/services/space_service.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -55,23 +57,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           });
 
                           try{
-                            final spaceId = await supabase.rpc(
-                              'check_invite_code', 
-                              params: {
-                                'code': typedCode
-                                }
-                            );
-
-                            if (spaceId == null){
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invalid code!')));
-                              return;
-                            }
-                            
-                            Map<String, dynamic> data = {};
-                            data['space_id'] = spaceId;
-                            data['user_id']=supabase.auth.currentUser!.id;
-
-                            await supabase.from('space_members').insert(data);
+                            await SpaceService().joinSpace(typedCode);
 
                             ref.invalidate(spacesProvider);
 
@@ -92,7 +78,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                             }
                           }
 
-                          if(mounted){
+                          if(context.mounted){
                             setState(() {
                               _isLoading = false;
                             });
@@ -109,7 +95,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             IconButton(
                 icon: Icon(Icons.logout),
                 onPressed: () async {
-                  await supabase.auth.signOut();
+                  await AuthService().signOut();
 
                   if (context.mounted){
                     context.go('/login');
@@ -235,16 +221,11 @@ class _CreateSpaceSheetState extends ConsumerState<CreateSpaceSheet> {
 
                   while(!success){
                     try{
-                      Map<String, dynamic> data = {};
-                      data['name']=_spaceName.text;
-                      data['description']=_description.text.isEmpty?null:_description.text;
-                      data['is_public']=isPublic;
-                      data['creator_id']=supabase.auth.currentUser!.id;
-                      data['invite_code']=Random().nextInt(999999).toString().padLeft(6,'0');
-
-                      await supabase.from('spaces').insert(data);
-                      
-                      success=true;
+                      await SpaceService().createSpace(
+                        name: _spaceName.text.trim(),
+                        description: _description.text.trim().isEmpty ? null : _description.text.trim(),
+                        isPublic: isPublic,
+                      );
 
                       ref.invalidate(spacesProvider);
 
@@ -265,7 +246,7 @@ class _CreateSpaceSheetState extends ConsumerState<CreateSpaceSheet> {
                     }    
                   }
 
-                  if (mounted) {
+                  if (context.mounted) {
                     setState(() {
                       _isLoading = false;
                     });

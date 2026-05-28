@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:study_spaces/services/auth_service.dart';
 
 class LoginPage extends StatefulWidget{
   const LoginPage({super.key});
@@ -13,7 +14,6 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
   bool _isLoading=false;
-  final supabase = Supabase.instance.client;
 
   @override
   void dispose(){
@@ -51,13 +51,7 @@ class _LoginPageState extends State<LoginPage> {
               });
 
               try{
-                final AuthResponse res = await supabase.auth.signInWithPassword(
-                  email: email,
-                  password: pass,
-                );
-
-                final Session? session = res.session;
-                final User? user = res.user;
+                final AuthResponse res = await AuthService().login(email: email, password: pass);
 
                 if(!context.mounted) return;
 

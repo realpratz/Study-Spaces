@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:study_spaces/providers/profile_provider.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:study_spaces/services/profile_service.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -52,10 +55,57 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircleAvatar(
-                    //Note to self---> add supabase storage based avatar feature in future
-                    backgroundImage: profile.avatarUrl!=null?NetworkImage(profile.avatarUrl!):null,
-                    child: profile.avatarUrl==null?Icon(Icons.person):null,
+                  Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundImage: profile.avatarUrl != null?NetworkImage(profile.avatarUrl!):null,
+                        child: profile.avatarUrl == null?Icon(Icons.person):null,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          icon: Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                          onPressed: _isLoading ? null : () async {
+                            final ImagePicker picker = ImagePicker();
+                            final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                            
+                            if (image == null) return;
+
+                            setState(() {
+                              _isLoading = true;
+                            });
+
+                            try{
+                              await ProfileService().uploadAvatarFile(File(image.path));
+                              
+                              ref.invalidate(profileProvider); 
+                              
+                              if(context.mounted){
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Avatar uploaded!')));
+                              }
+                            } 
+                            catch(e)
+                            {
+                              print('Uploading Avatar Failed: $e');
+
+                              if(context.mounted){
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
+                              }
+                            }
+                            if(context.mounted){
+                              setState(() {
+                                _isLoading = false;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                   Text(profile.email),
                   TextField(
@@ -70,7 +120,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       });
 
                       try{
-                        await supabase.from('profiles').update({'avatar_url': _UrlController.text.trim()}).eq('id',profile.id);
+                        await ProfileService().updateAvatarUrl(_UrlController.text.trim());
 
                         ref.invalidate(profileProvider);
 
@@ -87,7 +137,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         }
                       }    
 
-                      if (mounted) {
+                      if(context.mounted) {
                         setState(() {
                           _isLoading = false;
                         });
