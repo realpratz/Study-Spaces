@@ -229,6 +229,8 @@ class _CreateSpaceSheetState extends ConsumerState<CreateSpaceSheet> {
 
                       ref.invalidate(spacesProvider);
 
+                      success=true;
+
                       if(context.mounted) {
                         context.pop();
                       }

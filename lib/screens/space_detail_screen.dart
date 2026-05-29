@@ -29,7 +29,7 @@ class _SpaceDetailScreenState extends ConsumerState<SpaceDetailScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.spaceName),
-          bottom: const TabBar(
+          bottom: TabBar(
             tabs: [
               Tab(icon: Icon(Icons.style), text: "Decks"),
               Tab(icon: Icon(Icons.notes), text: "Notes"),
@@ -57,7 +57,15 @@ class _SpaceDetailScreenState extends ConsumerState<SpaceDetailScreen> {
                       leading: Icon(Icons.folder),
                       title: Text(deck.title),
                       trailing: Icon(Icons.chevron_right),
-                      onTap: (){},
+                      onTap: (){
+                        context.push(
+                          '/deck',
+                        extra: {
+                          'deckId': deck.id,
+                          'deckTitle': deck.title,
+                        },
+                        );
+                      },
                     );
                   },
                 );
@@ -91,6 +99,112 @@ class _SpaceDetailScreenState extends ConsumerState<SpaceDetailScreen> {
             ),
           ],
         ),
+        floatingActionButton: Builder(
+          builder: (BuildContext fabContext){
+            return FloatingActionButton.extended(
+              onPressed:(){
+                final currentTab = DefaultTabController.of(fabContext).index;
+
+                if (currentTab==0) {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) => CreateDeckSheet(spaceId: widget.spaceID),
+                  );
+                } 
+                else{
+                  //Note to self: add notes 
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Note to self: add notes')));
+                }
+              },
+              icon:Icon(Icons.add),
+              label:Text('Create'),
+            );
+          }
+        )
+      )
+    );
+  }
+}
+
+class CreateDeckSheet extends ConsumerStatefulWidget {
+  final String spaceId;
+
+  const CreateDeckSheet({
+    super.key, 
+    required this.spaceId
+  });
+
+  @override
+  ConsumerState<CreateDeckSheet> createState() => _CreateDeckSheetState();
+}
+
+class _CreateDeckSheetState extends ConsumerState<CreateDeckSheet> {
+  final TextEditingController _titleController = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Create New Deck'),
+          TextField(
+            controller: _titleController,
+            decoration: InputDecoration(
+              labelText: 'Deck Title',
+            ),
+          ),
+          SizedBox(
+            child: FilledButton(
+              onPressed: _isLoading?null: ()async{
+
+                final String title = _titleController.text.trim();
+                if(title.isEmpty) return;
+
+                if(context.mounted){
+                  setState(() {
+                    _isLoading = true;
+                  });
+                }
+
+                try{
+                  await StudyService().createDeck(
+                    spaceId: widget.spaceId, 
+                    title: title,
+                  );
+
+                  ref.invalidate(decksProvider(widget.spaceId));
+
+                  if(context.mounted){
+                    context.pop();
+                  }
+                } 
+                catch(e){
+                  if(context.mounted){
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error creating deck: $e')));
+                  }
+                }
+
+                if(context.mounted){
+                  setState(() {
+                    _isLoading = false;
+                  });
+                }
+              },
+
+              child:_isLoading?CircularProgressIndicator(): Text('Create Deck'),
+            ),
+          ),
+        ],
       ),
     );
   }

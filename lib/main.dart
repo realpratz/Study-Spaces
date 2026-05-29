@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:study_spaces/screens/deck_detail_screen.dart';
 import 'package:study_spaces/screens/profile_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,6 +64,17 @@ final _router = GoRouter(
                         return SpaceDetailScreen(
                           spaceID: extras['id'] as String,
                           spaceName: extras['name'] as String,
+                        );
+                      },
+                    ),
+                    GoRoute(
+                      path: '/deck',
+                      builder: (context, state) {
+                        final extras = state.extra as Map<String, dynamic>;
+                                                
+                        return DeckDetailScreen(
+                          deckId: extras['deckId'] as String,
+                          deckTitle: extras['deckTitle'] as String,
                         );
                       },
                     ),
