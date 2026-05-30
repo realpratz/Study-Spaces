@@ -21,6 +21,68 @@ To install the app directly on an Android device:
 4. Open the file on your device to complete the installation and launch the app.
 
 ## How to Run
+### 1. Authentication
+Users can easily create a new account or log into an existing one using Supabase authentication.
+<p>
+  <img src="screenshots/signup.png" width="250" alt="Sign Up Screen">
+  <img src="screenshots/login.png" width="250" alt="Login Screen">
+</p>
+
+### 2. Creating Study Spaces
+Your Home screen acts as a dashboard. The first icon on top right is to Join a study space, the second icon is to sign out and go back to Login page, and the third icon is to go to your profile. 
+
+From here, you can create a brand new personal space by click on the "+" on bottom right.
+<p>
+  <img src="screenshots/home_empty.png" width="250" alt="Empty Home Screen">
+  <img src="screenshots/create_space.png" width="250" alt="Create Space Sheet">
+  <img src="screenshots/space_created.png" width="250" alt="Space Created">
+</p>
+
+### 3. Flashcards & Decks
+Inside a Space, you can create custom flashcard Decks. Once a deck is created, you can easily add, edit, or delete individual cards to build your study material.
+<p>
+  <img src="screenshots/space_empty.png" width="250" alt="Empty Space">
+  <img src="screenshots/create_deck.png" width="250" alt="Create Deck Sheet">
+  <img src="screenshots/deck_created.png" width="250" alt="Deck Created">
+  <img src="screenshots/deck_empty.png" width="250" alt="Empty Deck">
+</p>
+
+**Card Management:**
+<p>
+  <img src="screenshots/create_card.png" width="250" alt="Create Card">
+  <img src="screenshots/card_created.png" width="250" alt="Card Created">
+  <img src="screenshots/edit_card.png" width="250" alt="Edit Card">
+  <img src="screenshots/delete_card.png" width="250" alt="Delete Card">
+  <img src="screenshots/empty_deck_delete.png" width="250" alt="Empty Deck After Deletion">
+</p>
+
+### 4. Notes (WIP)
+Alongside flashcards, users can switch to the Notes tab to write, edit, and store rich-text notes directly within their study space.
+<p>
+  <img src="screenshots/create_note.png" width="250" alt="Create Note">
+</p>
+
+### 5. Joining Study Spaces
+Alongside creating your own spaces, you can join your friends' spaces too! Click on "Join" icon on the top right (1st Icon), and enter your friend's space code. Each public space has its own unique 6 digit code. Remember, you can ONLY join public spaces.
+
+The 6 digit codes are present as selectable text on the top of the appbar alongside the Space name.
+
+**Space Creators' View:**
+<p>
+  <img src="screenshots/editable_text_code.png" width="250" alt="Editable Text">
+</p>
+
+**Joinees' View:**
+<p>
+  <img src="screenshots/join_space.png" width="250" alt="Join Space Dialog">
+  <img src="screenshots/space_appeared.png" width="250" alt="Joined Space Appeared">
+</p>
+
+### 6. Profile Management
+Users can update their personal profile, including setting an avatar via a URL or selecting an image from your gallery.
+<p>
+  <img src="screenshots/profile.png" width="250" alt="Profile Screen">
+</p>
 
 ## Tech Stack
 
