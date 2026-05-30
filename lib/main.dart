@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:study_spaces/screens/deck_detail_screen.dart';
 import 'package:study_spaces/screens/profile_screen.dart';
@@ -21,8 +23,26 @@ Future<void> main() async {
   runApp(const ProviderScope(child:MainApp()));
 }
 
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen(
+      (dynamic _) => notifyListeners(),
+    );
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+
 final _router = GoRouter(
                   initialLocation: "/login",
+                  refreshListenable: GoRouterRefreshStream(supabase.auth.onAuthStateChange),
                   redirect: (context, state) {
                     final session = supabase.auth.currentSession;
                     final isLoggedIn= (session!=null);

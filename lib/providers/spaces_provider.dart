@@ -6,5 +6,8 @@ import 'package:study_spaces/services/space_service.dart';
 final supabase = Supabase.instance.client;
 
 final spacesProvider = FutureProvider<List<StudySpace>>((ref) async {
+  //for shimmer tests
+  //await Future.delayed(Duration(seconds: 15));
+
   return await SpaceService().fetchSpaces();
 });

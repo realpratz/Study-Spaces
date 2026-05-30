@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:study_spaces/providers/profile_provider.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
@@ -46,7 +47,36 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           return Center(child: Text('Error: $error'));
         },
         loading: () {
-          return Center(child: CircularProgressIndicator());
+         return ListView.builder(
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              return Shimmer.fromColors(
+                baseColor: Colors.grey[800]!,
+                highlightColor: Colors.grey[700]!,
+                child: ListTile(
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  title: Container(
+                    height: 16,
+                    width: double.infinity,
+                    color: Colors.white,
+                  ),
+                  subtitle: Container(
+                    height: 14,
+                    width: 150,
+                    color: Colors.white,
+                    margin: EdgeInsets.only(top: 8),
+                  ),
+                ),
+              );
+            }
+         );
         },
         data: (profile) {
           return Center(

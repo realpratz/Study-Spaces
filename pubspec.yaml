@@ -1,5 +1,5 @@
 name: study_spaces
-description: "A new Flutter project."
+description: "A collaborative study app where students join shared Study Spaces to learn together."
 publish_to: 'none'
 version: 0.1.0+1
 
@@ -10,13 +10,17 @@ dependencies:
   dio: ^5.9.2
   flutter:
     sdk: flutter
+  flutter_quill: ^11.5.1
   flutter_riverpod: ^3.3.1
   go_router: ^17.2.3
   image_picker: ^1.2.2
+  shimmer: ^3.0.0
   supabase_flutter: ^2.12.4
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
   flutter_lints: ^6.0.0
 
