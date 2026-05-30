@@ -84,6 +84,8 @@ final _router = GoRouter(
                         return SpaceDetailScreen(
                           spaceID: extras['id'] as String,
                           spaceName: extras['name'] as String,
+                          inviteCode: extras['inviteCode'] as String,
+                          isPublic: extras['isPublic'] as bool,
                         );
                       },
                     ),

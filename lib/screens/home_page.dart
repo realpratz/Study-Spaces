@@ -7,6 +7,7 @@ import 'package:study_spaces/models/study_space.dart';
 import 'package:study_spaces/services/auth_service.dart';
 import 'package:study_spaces/services/space_service.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:study_spaces/providers/profile_provider.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -95,6 +96,9 @@ class _HomePageState extends ConsumerState<HomePage> {
             IconButton(
                 icon: Icon(Icons.logout),
                 onPressed: () async {
+                  ref.invalidate(spacesProvider);
+                  ref.invalidate(profileProvider);
+
                   await AuthService().signOut();
 
                   if (context.mounted){
@@ -163,6 +167,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                     extra:{
                       'id': currentSpace.id,
                       'name': currentSpace.name,
+                      'inviteCode': currentSpace.inviteCode,
+                      'isPublic': currentSpace.isPublic,
                     },
                   );
                 },

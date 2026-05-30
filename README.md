@@ -84,5 +84,5 @@ To install the app directly on an Android device:
 * [Flutter Supabase Auth Tutorial](https://www.youtube.com/watch?v=njeo_g-3tPw)
 
 AI tooling was used in a strictly limited capacity during this project. Usage was restricted to:
-1. **Debugging**
+1. **Debugging and Ideation**
 2. **Supabase Storage Integration:** Resolving errors and syntax issues while working with Supabase storage, image_picker, io.

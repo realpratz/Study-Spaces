@@ -84,63 +84,69 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               padding: EdgeInsets.all(24),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Stack(
-                    alignment: Alignment.bottomRight,
-                    children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: profile.avatarUrl != null?NetworkImage(profile.avatarUrl!):null,
-                        child: profile.avatarUrl == null?Icon(Icons.person):null,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          shape: BoxShape.circle,
+                  Center(
+                    child: Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundImage: profile.avatarUrl != null?NetworkImage(profile.avatarUrl!):null,
+                          child: profile.avatarUrl == null?Icon(Icons.person):null,
                         ),
-                        child: IconButton(
-                          icon: Icon(Icons.camera_alt, color: Colors.white, size: 20),
-                          onPressed: _isLoading ? null : () async {
-                            final ImagePicker picker = ImagePicker();
-                            final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-                            
-                            if (image == null) return;
-
-                            setState(() {
-                              _isLoading = true;
-                            });
-
-                            try{
-                              await ProfileService().uploadAvatarFile(File(image.path));
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                            onPressed: _isLoading ? null : () async {
+                              final ImagePicker picker = ImagePicker();
+                              final XFile? image = await picker.pickImage(source: ImageSource.gallery);
                               
-                              ref.invalidate(profileProvider); 
-                              
-                              if(context.mounted){
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Avatar uploaded!')));
-                              }
-                            } 
-                            catch(e)
-                            {
-                              print('Uploading Avatar Failed: $e');
+                              if (image == null) return;
 
-                              if(context.mounted){
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
-                              }
-                            }
-                            if(context.mounted){
                               setState(() {
-                                _isLoading = false;
+                                _isLoading = true;
                               });
-                            }
-                          },
+
+                              try{
+                                await ProfileService().uploadAvatarFile(File(image.path));
+                                
+                                ref.invalidate(profileProvider); 
+                                
+                                if(context.mounted){
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Avatar uploaded!')));
+                                }
+                              } 
+                              catch(e)
+                              {
+                                print('Uploading Avatar Failed: $e');
+
+                                if(context.mounted){
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
+                                }
+                              }
+                              if(context.mounted){
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                              }
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  Text(profile.email),
+                  SizedBox(height: 24),
+                  Center(child: Text(profile.email)),
+                  SizedBox(height: 24),
                   TextField(
                     controller: _UrlController,
                   ),
+                  SizedBox(height: 16),
                   FilledButton(
                     onPressed: _isLoading? null : () async {
                       if (_UrlController.text.trim().isEmpty) return;

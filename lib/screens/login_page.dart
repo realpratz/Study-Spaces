@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:study_spaces/services/auth_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:study_spaces/providers/spaces_provider.dart';
 
-class LoginPage extends StatefulWidget{
+class LoginPage extends ConsumerStatefulWidget{
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
   bool _isLoading=false;
@@ -25,64 +27,73 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      body: Column(
-        children: [
-          TextField(
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
-              label: Text('Email ID'),
+      body: Padding(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                label: Text('Email ID'),
+              ),
             ),
-          ),
-          TextField(
-            controller: _passController,
-            obscureText: true,
-            decoration: InputDecoration(
-              label: Text('Password'),
+            TextField(
+              controller: _passController,
+              obscureText: true,
+              decoration: InputDecoration(
+                label: Text('Password'),
+              ),
             ),
-          ),
-          FilledButton(
-            onPressed: _isLoading? null :() async {
-              final email=_emailController.text.trim();
-              final pass=_passController.text.trim();
-              
-              setState(() {
-                _isLoading = true;
-              });
+            SizedBox(height: 24),
+            FilledButton(
+              onPressed: _isLoading? null :() async {
+                final email=_emailController.text.trim();
+                final pass=_passController.text.trim();
+                
+                setState(() {
+                  _isLoading = true;
+                });
 
-              try{
-                final AuthResponse res = await AuthService().login(email: email, password: pass);
+                try{
+                  final AuthResponse res = await AuthService().login(email: email, password: pass);
 
-                if(!context.mounted) return;
+                  if(!context.mounted) return;
 
-                context.go('/home');
-              }
-              catch(e){
-                print('Login failed: $e');
+                  ref.invalidate(spacesProvider);
 
-                if(context.mounted) {
-                  if(e is AuthException) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
-                  }
-                  else{
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('An error occurred while logging in. Try again later.')));
+                  context.go('/home');
+                }
+                catch(e){
+                  print('Login failed: $e');
+
+                  if(context.mounted) {
+                    if(e is AuthException) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+                    }
+                    else{
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('An error occurred while logging in. Try again later.')));
+                    }
                   }
                 }
-              }
 
-              setState(() {
-                _isLoading = false;
-              });
-            },
-            child: _isLoading?CircularProgressIndicator(): Text('Login!'),
-          ),
-          TextButton(
-            onPressed: () {
-              context.go('/signup');
-            }, 
-            child: Text("Don't have an account? Sign up!"),
-          )
-        ],
+                setState(() {
+                  _isLoading = false;
+                });
+              },
+              child: _isLoading?CircularProgressIndicator(): Text('Login!'),
+            ),
+            SizedBox(height: 16),
+            TextButton(
+              onPressed: () {
+                context.go('/signup');
+              }, 
+              child: Text("Don't have an account? Sign up!"),
+            )
+          ],
+        )
       )
     );
   }

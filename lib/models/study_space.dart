@@ -23,7 +23,7 @@ class StudySpace{
       createdAt: DateTime.parse(json['created_at']),
       name: json['name'] as String,
       description: json['description'] as String?,
-      isPublic: json['is_public'] as bool,
+      isPublic: json['is_public'] as bool? ?? false,
       inviteCode: json['invite_code'] as String,
       creatorId: json['creator_id'] as String,
     );
