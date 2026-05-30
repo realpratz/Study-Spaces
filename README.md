@@ -20,6 +20,8 @@ To install the app directly on an Android device:
 3. Transfer the downloaded APK file to your Android device.
 4. Open the file on your device to complete the installation and launch the app.
 
+## How to Run
+
 ## Tech Stack
 
 * **Frontend:** Flutter
@@ -50,16 +52,16 @@ To install the app directly on an Android device:
 ### Phase 3: Flashcards & Notes
 - [x] Build flashcard deck list and deck creation UI within a space.
 - [x] Implement add/edit/delete individual flashcards (front & back).
-- [] Add flip animation for review mode and swipe-through study session.
-- [] Build notes list and editing UI with flutter_quill rich text editor.
-- [WIP] Persist all content to Supabase with full CRUD operations.
+- [ ] Add flip animation for review mode and swipe-through study session.
+- [ ] Build notes list and editing UI with flutter_quill rich text editor.
+- [x] [WIP] Persist all content to Supabase with full CRUD operations.
 
 ### Phase 4: Comments, Realtime & Polish
 - [ ] Build threaded comment UI on flashcards and notes.
 - [ ] Set up Supabase Realtime subscriptions for live comment updates.
 - [x] Polish UI with loading skeletons, empty states, and error toasts.
 - [x] Handle edge cases: no internet, auth expiry, and duplicate join codes.
-- [WIP] Write integration tests and finalise README documentation.
+- [x] [WIP] Write integration tests and finalise README documentation.
 
 ### Phase 5: Intelligent Learning
 - [ ] AI-Generated Flashcards: Integrate Supabase Edge Functions with an LLM API to automatically generate flashcard decks from user notes.
